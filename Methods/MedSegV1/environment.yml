@@ -1,0 +1,9 @@
+name: medsegdiff-audit-rtx5090
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10.20
+  - pip
+  - pip:
+      - -r requirements.txt
+

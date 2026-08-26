@@ -1,0 +1,12 @@
+name: sdseg-release
+channels:
+  - defaults
+dependencies:
+  - python=3.10.20
+  - pip=26.0.1
+  - setuptools=70.2.0
+  - wheel=0.46.3
+  - pip:
+      # This installs the release-runtime snapshot into a NEW environment.
+      # It must not be used to update the proven sdseg environment in place.
+      - -r requirements.txt

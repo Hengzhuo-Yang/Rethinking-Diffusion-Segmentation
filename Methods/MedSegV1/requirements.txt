@@ -1,0 +1,17 @@
+numpy==1.26.4
+pandas==2.2.3
+blobfile==2.1.1
+nibabel==5.4.2
+opencv-python==4.11.0.86
+scikit-image==0.24.0
+scikit-learn==1.5.2
+matplotlib==3.9.4
+batchgenerators==0.25.2
+visdom==0.2.4
+torchsummary==1.5.1
+scipy==1.13.1
+pillow==11.3.0
+python-dateutil==2.9.0.post0
+prettytable==3.17.0
+tqdm==4.68.1
+

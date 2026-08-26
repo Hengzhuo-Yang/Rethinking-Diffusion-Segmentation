@@ -1,0 +1,152 @@
+model:
+  # Release-modified paths/splits/metric names; see MODIFICATIONS.md.
+  base_learning_rate: 1e-5   # ori: 5e-5
+  target: ldm.models.diffusion.ddpm.LatentDiffusion
+  params:
+    num_classes: 2
+    load_only_unet: true
+    linear_start: 0.0015
+    linear_end: 0.0155
+    num_timesteps_cond: 1
+    log_every_t: 200
+    timesteps: 1000
+    loss_type: l1
+    audit_mode: none
+    first_stage_key: "segmentation"
+    cond_stage_key: "image"
+    conditioning_key: "concat"
+    image_size: 32
+    channels: 4
+    cond_stage_trainable: true
+    concat_mode: true
+    scale_by_std: true
+    use_ema: true
+    monitor: "val_avg_dice"
+    ckpt_path: "${oc.env:TSLDSEG_LDM_CKPT,models/ldm/lsun_churches256/model.ckpt}"
+
+    scheduler_config:
+      target: ldm.lr_scheduler.LambdaLinearScheduler
+      params:
+        warm_up_steps: [5000]
+        cycle_lengths: [10000000000000]
+        f_start: [1.e-6]
+        f_max: [1.]
+        f_min: [1.]
+
+    unet_config:
+      target: ldm.modules.diffusionmodules.openaimodel.UNetModel
+      params:
+        image_size: 32
+        in_channels: 8
+        out_channels: 4
+        model_channels: 192
+        attention_resolutions: [1, 2, 4, 8]
+        num_res_blocks: 2
+        channel_mult: [1, 2, 2, 4, 4]
+        num_heads: 8
+        use_scale_shift_norm: true
+        resblock_updown: true
+        dropout: 0.2
+
+    first_stage_config:
+      target: ldm.models.autoencoder.AutoencoderKL
+      params:
+        embed_dim: 4
+        monitor: "val/rec_loss"
+        ckpt_path: "${oc.env:TSLDSEG_VAE_CKPT,models/first_stage_models/kl-f8/model.ckpt}"
+        ddconfig:
+          double_z: true
+          z_channels: 4
+          resolution: 256
+          in_channels: 3
+          out_ch: 3
+          init_ch: 128
+          ch_mult: [1, 2, 4, 4]
+          num_res_blocks: 2
+          attn_resolutions: []
+          dropout: 0.0
+        lossconfig:
+          target: torch.nn.Identity
+
+    cond_stage_config:
+      target: ldm.modules.encoders.modules.AEEncoderEmbedder
+      params:
+        ckpt_path: "${oc.env:TSLDSEG_VAE_CKPT,models/first_stage_models/kl-f8/model.ckpt}"
+        embed_dim: 4
+        double_z: true
+        z_channels: 4
+        resolution: 256
+        in_channels: 3
+        out_ch: 3
+        init_ch: 128
+        ch_mult: [1, 2, 4, 4]
+        num_res_blocks: 2
+        attn_resolutions: []
+        dropout: 0.2
+
+data:
+  target: main.DataModuleFromConfig
+  params:
+    batch_size: 12
+    num_workers: 8
+    wrap: false
+    train:
+      target: ldm.data.isic.ISICTrain
+      params:
+        data_root: "${oc.env:TSLDSEG_ISIC2018_PREPROCESSED_ROOT,../data_preprocessed/isic2018}/ISIC18/training"
+        manifest_path: "manifests/isic2018/train.txt"
+        size: 256
+        year: 18
+        num_classes: 2
+    validation:
+      target: ldm.data.isic.ISICValidation
+      params:
+        data_root: "${oc.env:TSLDSEG_ISIC2018_PREPROCESSED_ROOT,../data_preprocessed/isic2018}/ISIC18/validation"
+        manifest_path: "manifests/isic2018/val.txt"
+        size: 256
+        year: 18
+        num_classes: 2
+    validation_metrics:
+      target: ldm.data.isic.ISICTest
+      params:
+        data_root: "${oc.env:TSLDSEG_ISIC2018_PREPROCESSED_ROOT,../data_preprocessed/isic2018}/ISIC18/validation"
+        manifest_path: "manifests/isic2018/val.txt"
+        size: 256
+        year: 18
+        num_classes: 2
+    test:
+      target: ldm.data.isic.ISICTest
+      params:
+        data_root: "${oc.env:TSLDSEG_ISIC2018_PREPROCESSED_ROOT,../data_preprocessed/isic2018}/ISIC18/testing"
+        manifest_path: "manifests/isic2018/test.txt"
+        size: 256
+        year: 18
+        num_classes: 2
+
+lightning:
+  modelcheckpoint:
+    target: pytorch_lightning.callbacks.ModelCheckpoint
+    params:
+      filename: "best-{step:06}-{val_avg_dice:.6f}"
+      monitor: "val_avg_dice"
+      mode: "max"
+      save_top_k: 1
+      save_last: false
+      every_n_train_steps: 2000
+      verbose: true
+  callbacks:
+    image_logger:
+      target: main.ImageLogger
+      params:
+        batch_frequency: 2000
+        max_images: 8
+        increase_log_steps: false
+        log_dice_frequency: 2000
+        log_first_step: true
+
+  trainer:
+    max_steps: 50000
+    benchmark: true
+    check_val_every_n_epoch: 2
+    accumulate_grad_batches: 1
+    gpus: 0,

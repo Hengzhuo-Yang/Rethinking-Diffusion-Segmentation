@@ -1,0 +1,44 @@
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Environments and local configuration
+.venv/
+venv/
+.env
+.env.*
+
+# Data and medical images
+data/
+raw/
+data_preprocessed/
+*.nii
+*.nii.gz
+*.dcm
+*.h5
+*.hdf5
+*.npy
+*.npz
+
+# Model weights and checkpoints
+*.pt
+*.pth
+*.ckpt
+*.safetensors
+assets/
+pretrained/
+
+# Runtime outputs
+outputs/
+runs/
+logs/
+wandb/
+lightning_logs/
+*.log
+events.out.tfevents.*
+
+# Local test work
+.smoke_work/
+.source_baseline.csv
+.source_final.csv

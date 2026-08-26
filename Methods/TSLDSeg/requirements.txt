@@ -1,0 +1,40 @@
+--index-url https://download.pytorch.org/whl/cu128
+--extra-index-url https://pypi.org/simple
+
+# Runtime versions come from the validated local RTX 5090 environment
+# (Python 3.10.20). pytest is the release-test runner dependency.
+torch==2.11.0
+torchvision==0.26.0
+numpy==1.26.4
+pillow==12.2.0
+opencv-python==4.11.0.86
+scipy==1.15.3
+pytorch-lightning==1.9.5
+omegaconf==2.3.0
+einops==0.3.0
+pandas==2.3.3
+PyYAML==6.0.3
+tqdm==4.67.3
+matplotlib==3.10.9
+ptflops==0.7.3
+thop==0.1.1.post2209072238
+tensorboard==2.20.0
+torchmetrics==0.11.4
+albumentations==2.0.8
+diffusers==0.12.1
+transformers==4.19.2
+kornia==0.6.0
+test-tube==0.7.5
+h5py==3.16.0
+nibabel==5.4.2
+invisible-watermark==0.2.0
+imageio==2.9.0
+imageio-ffmpeg==0.4.2
+packaging==26.0
+ftfy==6.3.1
+regex==2026.5.9
+pytest==8.4.2
+
+git+https://github.com/CompVis/taming-transformers.git@3ba01b241669f5ade541ce990f7650a3b8f65318#egg=taming-transformers
+git+https://github.com/openai/CLIP.git@d05afc436d78f1c48dc0dbf8e5980a9d471f35f6#egg=clip
+-e ./code

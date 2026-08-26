@@ -1,0 +1,50 @@
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Environments and editor state
+.venv/
+venv/
+env/
+.idea/
+.vscode/
+
+# Runtime outputs
+outputs/
+results/
+runs/
+logs/
+wandb/
+*.log
+events.out.tfevents.*
+
+# Models and optimizer state
+*.pt
+*.pth
+*.ckpt
+
+# Medical data and generated caches
+data/
+data_preprocessed/
+*.nii
+*.nii.gz
+*.h5
+*.hdf5
+*.npy
+*.npz
+*.mha
+*.mhd
+
+# Archives, papers, and local packaging
+*.zip
+*.tar
+*.tar.gz
+*.7z
+*.pdf
+
+# OS files
+.DS_Store
+Thumbs.db

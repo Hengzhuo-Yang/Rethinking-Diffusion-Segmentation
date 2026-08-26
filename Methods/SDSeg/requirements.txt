@@ -1,0 +1,41 @@
+# Reproducibility snapshot of the release-runtime packages in the proven sdseg
+# environment. Install into a NEW environment; do not modify the proven one.
+--extra-index-url https://download.pytorch.org/whl/cu128
+
+torch==2.11.0+cu128
+torchvision==0.26.0+cu128
+pytorch-lightning==1.9.5
+torchmetrics==0.11.4
+lightning-utilities==0.15.3
+
+numpy==1.26.4
+Pillow==12.2.0
+scipy==1.15.3
+h5py==3.16.0
+nibabel==5.4.2
+opencv-python==4.11.0.86
+opencv-python-headless==4.13.0.92
+imageio==2.9.0
+imageio-ffmpeg==0.4.2
+matplotlib==3.10.9
+pandas==2.3.3
+
+albumentations==2.0.8
+einops==0.3.0
+kornia==0.6.0
+omegaconf==2.3.0
+PyYAML==6.0.3
+tqdm==4.67.3
+packaging==26.0
+test-tube==0.7.5
+tensorboard==2.20.0
+
+transformers==4.19.2
+tokenizers==0.12.1
+ftfy==6.3.1
+regex==2026.5.9
+requests==2.34.2
+
+# The proven environment used editable checkouts at these exact revisions.
+git+https://github.com/CompVis/taming-transformers.git@3ba01b241669f5ade541ce990f7650a3b8f65318#egg=taming-transformers
+git+https://github.com/openai/CLIP.git@d05afc436d78f1c48dc0dbf8e5980a9d471f35f6#egg=clip

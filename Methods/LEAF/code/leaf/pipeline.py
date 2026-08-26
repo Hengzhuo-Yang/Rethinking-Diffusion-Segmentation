@@ -1,0 +1,136 @@
+import torch
+import numpy as np
+from dataclasses import dataclass
+from typing import List, Optional, Union
+
+from tqdm.auto import tqdm
+from diffusers import DiffusionPipeline, DDIMScheduler
+from leaf.unet import UNetModel
+from leaf.autoencoder import AutoencoderKL, LatentEncoder
+
+@dataclass
+class LeafOutput:
+
+    mask_pred: torch.Tensor # float format, [0, 1] (B, 3, H, W)
+    mask_np: np.ndarray # [0, 1] (B, 3, H, W)
+    actual_timestep_schedule: Optional[List[int]] = None
+    requested_steps: Optional[int] = None
+
+class LeafPipeline(DiffusionPipeline):
+
+    def __init__(
+        self,
+        vae: AutoencoderKL,
+        unet: UNetModel,
+        latent_encoder: LatentEncoder,
+        scheduler: DDIMScheduler,
+        scaling_factor: float = 0.18215
+    ) -> None:
+
+        self.register_modules(
+            unet=unet,
+            vae=vae,
+            scheduler=scheduler,
+            latent_encoder=latent_encoder
+        )
+        self.scaling_factor = scaling_factor
+
+    def single_infer(
+        self,
+        rgb_norm: torch.Tensor,
+        num_inference_steps: int,
+        timesteps: List[int] = None,
+        generator: Optional[torch.Generator] = None,
+        show_pbar: bool = True,
+    ) -> tuple[torch.Tensor, List[int]]:
+        device = self.device
+        rgb_norm = rgb_norm.to(device)
+
+        self.scheduler.set_timesteps(num_inference_steps, device)
+        if num_inference_steps == 1:
+            timesteps = torch.tensor([self.scheduler.config.num_train_timesteps - 1]).to(device).long()
+        else:
+            timesteps = self.scheduler.timesteps
+        actual_timestep_schedule = [int(t) for t in timesteps.detach().cpu().tolist()]
+        
+        rgb_latent = self.latent_encoder(rgb_norm).mode()
+        rgb_latent = rgb_latent * self.scaling_factor
+
+        # Initial depth map (noise)
+        mask_latent = torch.randn(
+            rgb_latent.shape,
+            device=device,
+            dtype=self.dtype,
+            generator=generator,
+        )  # [B, 4, h, w]
+
+        # Denoising loop
+        if show_pbar:
+            iterable = tqdm(
+                enumerate(timesteps),
+                total=len(timesteps),
+                leave=False,
+                desc=" " * 4 + "Diffusion denoising",
+            )
+        else:
+            iterable = enumerate(timesteps)
+
+        for i, t in iterable:
+            unet_input = torch.cat(
+                [rgb_latent, mask_latent], dim=1
+            )  # this order is important
+
+            # predict the noise residual
+            timestep = torch.tensor([t]).repeat(rgb_latent.shape[0]).to(device).long()
+            model_pred = self.unet(unet_input, timestep).sample  # [B, 4, h, w]
+
+            # compute the previous noisy sample x_t -> x_t-1
+            if num_inference_steps == 1 and self.scheduler.config.prediction_type != "epsilon":
+                mask_latent = self.scheduler.step(
+                    model_pred, t, mask_latent, generator=generator
+                ).pred_original_sample
+            else:
+                mask_latent = self.scheduler.step(
+                    model_pred, t, mask_latent, generator=generator
+                ).prev_sample
+
+        mask_latent = mask_latent / self.scaling_factor
+        mask = self.vae.decode(mask_latent)
+
+        # clip prediction
+        mask = torch.clamp(mask, -1.0, 1.0)
+        # shift to [0, 1]
+        mask = (mask + 1.0) / 2.0
+
+        return mask, actual_timestep_schedule
+
+    @torch.no_grad()
+    def __call__(
+        self,
+        rgb_in: torch.Tensor,
+        num_inference_steps: int = 50,
+        processing_res: int = 256,
+        generator: Union[torch.Generator, None] = None,
+        resample_method: str = "bilinear",
+        show_progress_bar: bool = False
+    ) -> LeafOutput:
+        rgb_norm: torch.Tensor = rgb_in * 2.0 - 1.0
+        assert rgb_norm.min() >= -1.0 and rgb_norm.max() <= 1.0
+
+        # ----------------- Predicting segmentation mask -----------------
+        mask_pred, actual_timestep_schedule = self.single_infer(
+            rgb_norm=rgb_norm,
+            num_inference_steps=num_inference_steps,
+            show_pbar=show_progress_bar,
+            generator=generator
+        ) # [B, 3, H, W]
+        # torch.cuda.empty_cache()
+
+        mask_np = mask_pred.float().cpu().numpy()
+
+        return LeafOutput(
+            mask_pred=mask_pred,
+            mask_np=mask_np,
+            actual_timestep_schedule=actual_timestep_schedule,
+            requested_steps=num_inference_steps,
+        )

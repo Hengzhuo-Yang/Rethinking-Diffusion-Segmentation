@@ -1,0 +1,36 @@
+seed: 1337
+metrics:
+  - dice
+  - miou
+nrow: 6
+save_visualization: false
+output_dir: ../runs
+job_name: isic2018_leaf_binary_train_shuffle_yt_s1_100k_lam075
+audit_mode: train_shuffle_yt
+
+mixed_precision: bf16
+gradient_accumulation_steps: 1
+pretrained_model_name_or_path: assets
+use_alignment: true
+use_ema: true
+lam: 0.75
+prediction_type: sample
+vision_encoder_model: dinov2_vitb14_reg
+
+learning_rate: 4.0e-5
+weight_decay: 0.01
+
+num_warmup_steps: 10000
+max_train_steps: 100000
+
+base_data_dir: ../data_preprocessed/isic2018_task1_leaf_png
+dataset_name: ISIC18
+num_seg_classes: 2
+validation_split: validation
+resolution: 256
+train_batch_size: 4
+test_batch_size: 32
+num_workers: 4
+
+validation_start_steps: 30000
+validation_steps: 200
