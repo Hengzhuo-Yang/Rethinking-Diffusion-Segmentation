@@ -1,0 +1,49 @@
+# Python caches and test/tool state
+**/__pycache__/
+*.py[cod]
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+*.egg-info/
+
+# Local environments and editor state
+.venv/
+venv/
+.conda/
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Secrets and machine-local configuration
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Runtime outputs
+**/runs/
+**/logs/
+**/outputs/
+**/checkpoints/
+**/wandb/
+**/lightning_logs/
+events.out.tfevents.*
+STOP_TRAINING
+
+# Model and dataset artifacts
+*.ckpt
+*.pth
+*.pt
+*.safetensors
+*.onnx
+*.nii
+*.nii.gz
+*.h5
+*.hdf5
+*.npy
+*.npz
+*.zip
+*.tar
+*.tar.gz

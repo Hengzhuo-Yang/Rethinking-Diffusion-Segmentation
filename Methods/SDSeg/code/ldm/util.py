@@ -1,3 +1,8 @@
+# MODIFICATION NOTICE (release prepared 2026-07-19): this file differs from
+# upstream SDSeg commit 0b0aa388a5e2def75abfbef90d7bcfc5c16f2704.
+# Changes add trusted/current-PyTorch checkpoint compatibility used by the
+# retained release paths. See the method-root MODIFICATIONS.md.
+
 import importlib
 
 import torch

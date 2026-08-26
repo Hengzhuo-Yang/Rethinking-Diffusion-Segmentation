@@ -1,3 +1,8 @@
+# MODIFICATION NOTICE (release prepared 2026-07-19): this file differs from
+# upstream SDSeg commit 0b0aa388a5e2def75abfbef90d7bcfc5c16f2704.
+# Changes add explicit dataset/config/checkpoint inputs, fixed test manifests,
+# audit-mode handling, and portable evaluation. See MODIFICATIONS.md.
+
 import argparse, os, sys, glob, csv, json
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))

@@ -1,5 +1,10 @@
 # SDSeg reproducibility release
 
+> **Modification notice (release prepared 2026-07-19):** This is a modified
+> distribution of SDSeg based on upstream commit
+> `0b0aa388a5e2def75abfbef90d7bcfc5c16f2704`. The changes and their provenance
+> are recorded in [MODIFICATIONS.md](MODIFICATIONS.md).
+
 This repository packages the source needed to reproduce the fixed SDSeg audit
 matrix across BTCV, ACDC, and ISIC2018. It preserves the existing audited model
 branches and separates validation-based checkpoint selection from the one-time

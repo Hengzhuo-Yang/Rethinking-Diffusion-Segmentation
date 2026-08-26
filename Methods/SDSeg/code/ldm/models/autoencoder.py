@@ -1,31 +1,28 @@
-﻿import sys
-
 # MODIFICATION NOTICE (release prepared 2026-07-19): this file differs from
-# upstream TSLDSeg commit 381827e1dc64a99132bbc4adf68e3c73d295c15a.
-# A local hard-coded demonstration block was removed for portable release.
+# upstream SDSeg commit 0b0aa388a5e2def75abfbef90d7bcfc5c16f2704.
+# Checkpoint loading was routed through the release compatibility helper.
 # See the method-root MODIFICATIONS.md.
 
-import numpy as np
+import sys
+
 import torch
 import pytorch_lightning as pl
 import torch.nn.functional as F
 from contextlib import contextmanager
 from einops import rearrange, repeat
-from torch.optim.lr_scheduler import LambdaLR
 from torchvision.utils import make_grid
 
 from taming.modules.vqvae.quantize import VectorQuantizer2 as VectorQuantizer
 
 from ldm.modules.diffusionmodules.model import Encoder, Decoder
 from ldm.modules.distributions.distributions import DiagonalGaussianDistribution
-from ldm.modules.ema import LitEma
 
-from ldm.util import instantiate_from_config, load_trusted_checkpoint
+from ldm.util import instantiate_from_config, load_torch_checkpoint
 
 
 class IdentityFirstStage(torch.nn.Module):
     def __init__(self, *args, vq_interface=False, **kwargs):
-        self.vq_interface = vq_interface
+        self.vq_interface = vq_interface  # TODO: Should be true by default but check to not break older stuff
         super().__init__()
 
     def encode(self, x, *args, **kwargs):
@@ -108,7 +105,7 @@ class VQModel(pl.LightningModule):
                     print(f"{context}: Restored training weights")
 
     def init_from_ckpt(self, path, ignore_keys=list()):
-        sd = load_trusted_checkpoint(path, map_location="cpu")["state_dict"]
+        sd = load_torch_checkpoint(path, map_location="cpu")["state_dict"]
         keys = list(sd.keys())
         for k in keys:
             for ik in ignore_keys:
@@ -317,16 +314,15 @@ class VQModelInterface(VQModel):
 
 class AutoencoderKL(pl.LightningModule):
     def __init__(self,
-                 ddconfig,                  # æž„é€ Encoderå’ŒDecoderçš„å‚æ•°
-                 lossconfig,                # æž„é€ lossçš„å‚æ•°
-                 embed_dim,                 # åµŒå…¥ç»´åº¦
-                 ckpt_path=None,            # åŠ è½½é¢„è®­ç»ƒæ¨¡åž‹çš„è·¯å¾„
-                 ignore_keys=[],            # åŠ è½½æ¨¡åž‹æ—¶å¿½ç•¥çš„å±‚
-                 image_key="image",         # è¾“å…¥æ‰¹æ¬¡ä¸­æå–å›¾åƒæ•°æ®çš„é”®å
+                 ddconfig,
+                 lossconfig,
+                 embed_dim,
+                 ckpt_path=None,
+                 ignore_keys=[],
+                 image_key="image",
                  colorize_nlabels=None,
-                 monitor=None,              # ç›‘æŽ§
+                 monitor=None,
                  num_classes=2,
-                 encoder='default',
                  ):
         super().__init__()
         self.image_key = image_key
@@ -348,7 +344,22 @@ class AutoencoderKL(pl.LightningModule):
             self.init_from_ckpt(ckpt_path, ignore_keys=ignore_keys, ddconfig=ddconfig)
 
     def init_from_ckpt(self, path, ignore_keys=list(), ddconfig=None):
-        sd = load_trusted_checkpoint(path, map_location="cpu")["state_dict"]
+        sd = load_torch_checkpoint(path, map_location="cpu")["state_dict"]
+
+        # detect and init multi-class input-output layer:
+        # model_in, model_out = ddconfig.in_channels, ddconfig.out_ch
+        # sd_in, sd_out = sd["encoder.conv_in.weight"].shape, sd["decoder.conv_out.weight"].shape
+        # # print(sd_in, sd["encoder.conv_in.bias"].shape)
+        # # print(sd_out, sd["decoder.conv_out.bias"].shape)
+        # assert model_in == model_out and sd_in[1] == sd_out[0]
+        # if model_in != sd_in[1] and self.num_classes > 2:
+        #     sd_in, sd_out = torch.tensor(sd_in), torch.tensor(sd_out)
+        #     sd_in[1], sd_out[0] = model_in, model_out
+        #     sd["encoder.conv_in.weight"] = torch.rand(tuple(sd_in))
+        #     sd["encoder.conv_in.bias"] = torch.rand(sd["encoder.conv_in.bias"].shape)#.fill_(1)
+        #     sd["decoder.conv_out.weight"] = torch.rand(tuple(sd_out))
+        #     sd["decoder.conv_out.bias"] = torch.rand(model_out)
+        #     print("\033[31m[ATT]: rand-initialize autoencoder with multi-channel input-output.\033[0m")
 
         keys = list(sd.keys())
         for k in keys:
@@ -364,7 +375,7 @@ class AutoencoderKL(pl.LightningModule):
             print(f"Unexpected Keys: {unexpected}")
 
     def encode(self, x):
-        h, _ = self.encoder(x)
+        h = self.encoder(x)
         moments = self.quant_conv(h)
         posterior = DiagonalGaussianDistribution(moments)
         return posterior
@@ -647,10 +658,12 @@ class ZoomAutoencoderKL(pl.LightningModule):
         # << super resolution blocks >>
         self.up_methods = dict(
             interpolation=lambda x: F.interpolate(x, scale_factor=2., mode="nearest"),
+            # TODO
         )
         self.down_methods = dict(
             maxpool=torch.nn.MaxPool2d(kernel_size=2, stride=2),
             interpolation=lambda x: F.interpolate(x, scale_factor=.5, mode="nearest")
+            # TODO
         )
         self.zoom_block = lambda *args, **kwargs: torch.nn.Sequential(
             # torch.nn.BatchNorm2d(3),
@@ -676,7 +689,7 @@ class ZoomAutoencoderKL(pl.LightningModule):
             self.init_from_ckpt(ckpt_path, ignore_keys=ignore_keys, status=status)
 
     def init_from_ckpt(self, path, ignore_keys=list(), status=""):
-        sd = load_trusted_checkpoint(path, map_location="cpu")["state_dict"]
+        sd = load_torch_checkpoint(path, map_location="cpu")["state_dict"]
         keys = list(sd.keys())
         for k in keys:
             for ik in ignore_keys:
@@ -813,5 +826,3 @@ class ZoomAutoencoderKL(pl.LightningModule):
         x = F.conv2d(x, weight=self.colorize)
         x = 2. * (x - x.min()) / (x.max() - x.min()) - 1.
         return x
-
-

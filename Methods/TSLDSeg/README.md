@@ -199,3 +199,18 @@ show that auxiliary modules are useless, that every diffusion checkpoint
 ignores Y_t, or that a reverse trajectory is unnecessary. Interpretation must
 respect the objective class and should combine the three audits with separate
 sampling-step evidence.
+
+## License and attribution
+
+The primary upstream TSLDSeg code is distributed under the included MIT
+license. The official TSLDSeg project also declares SDSeg lineage, so this
+release retains the SDSeg CreativeML Open RAIL-M text at
+[`LICENSES/SDSeg-CreativeML-Open-RAIL-M.txt`](LICENSES/SDSeg-CreativeML-Open-RAIL-M.txt)
+for identified inherited material where those terms apply. The MIT file must
+not be read as erasing that separate layer.
+
+Retain `LICENSE`, `LICENSES/`, [`UPSTREAM.md`](UPSTREAM.md),
+[`MODIFICATIONS.md`](MODIFICATIONS.md), and
+[`THIRD_PARTY_NOTICES.md`](THIRD_PARTY_NOTICES.md) with redistributed copies.
+See [`RELEASE_COMPLIANCE_REPORT.md`](RELEASE_COMPLIANCE_REPORT.md) for the audit
+basis and its limits.

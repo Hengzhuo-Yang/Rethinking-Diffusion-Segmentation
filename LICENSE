@@ -1,0 +1,67 @@
+REPOSITORY LICENSE INDEX
+
+No single license applies to the complete contents of this repository. This
+file identifies license scope; it does not replace, weaken, or broaden any
+license or notice stored within a method directory.
+
+1. TOP-LEVEL COMPILATION MATERIAL
+
+The top-level README.md, THIRD_PARTY_NOTICES.md, .gitignore, .gitattributes,
+and the original selection and arrangement of those top-level materials are
+made available under the MIT License in LICENSES/ROOT-MIT.txt, to the extent
+that those materials are copyrightable and controlled by the repository
+contributors.
+
+That MIT grant does NOT apply to anything under Methods/ and does not relicense
+third-party material.
+
+2. METHOD-SPECIFIC SCOPE
+
+Methods/TSLDSeg/
+  The primary TSLDSeg upstream license is MIT. The directory also contains
+  identified SDSeg-derived material; the retained CreativeML Open RAIL-M text
+  in Methods/TSLDSeg/LICENSES/SDSeg-CreativeML-Open-RAIL-M.txt applies where
+  relevant. Consult LICENSE, LICENSES/, UPSTREAM.md, MODIFICATIONS.md, and
+  THIRD_PARTY_NOTICES.md in that directory.
+
+Methods/SDSeg/
+  CreativeML Open RAIL-M, together with the retained third-party notices and
+  license texts. Consult the method's LICENSE, LICENSES/, UPSTREAM.md,
+  MODIFICATIONS.md, and THIRD_PARTY_NOTICES.md.
+
+Methods/MedSegV1/
+  MIT for the identified primary upstream work, with separately identified
+  third-party MIT portions. Consult the method's LICENSE and LICENSES/.
+
+Methods/LEAF/
+  MIT for the identified primary upstream work. Identified third-party portions
+  include MIT- and Apache-2.0-licensed material. Consult the method's LICENSE,
+  LICENSES/, and THIRD_PARTY_NOTICES.md.
+
+Methods/EnsemDiff/
+  MIT for the identified primary upstream work. Identified third-party portions
+  include MIT- and Apache-2.0-licensed material. Consult the method's LICENSE,
+  LICENSES/, and THIRD_PARTY_NOTICES.md.
+
+Methods/cDAL/
+  Primarily the NVIDIA Source Code License-NC. Use is restricted to the
+  non-commercial research/evaluation scope stated in that license. Additional
+  portions carry their own retained terms, including the separately documented
+  NVIDIA LSGM license and processor condition. Consult the method's LICENSE,
+  LICENSES/, UPSTREAM.md, and THIRD_PARTY_NOTICES.md. This component is not
+  provided under an OSI-approved open-source license.
+
+3. FILE-SPECIFIC TERMS
+
+Where a source file or a nearer LICENSE, NOTICE, COPYING, SPDX identifier, or
+copyright header specifies different or additional terms, that more specific
+notice controls for that material. Preserve all applicable notices and comply
+with all conditions, including attribution, modification-notice, use-field,
+and non-commercial restrictions.
+
+Combining the six method directories in one Git repository is an aggregation
+for navigation and reproducibility. It does not merge their licenses or grant
+rights to datasets, model weights, papers, trademarks, or other assets that are
+not included here.
+
+This index is provided for release organization and is not legal advice.

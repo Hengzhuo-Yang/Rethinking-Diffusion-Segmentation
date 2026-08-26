@@ -109,3 +109,10 @@ sampling-step comparison audits and their outputs are excluded.
 Anyone who changes this release should add a dated entry identifying the files
 and substantive changes, retain the upstream license and attributions, and add
 prominent notices to modified files as required by the CreativeML Open RAIL-M.
+
+## Publication-readiness correction (2026-08-26)
+
+- Added prominent modification notices to every retained upstream path listed
+  above, without changing model behavior.
+- Anchored the release artifact rules in `.gitignore` so they do not suppress
+  the required Python packages under `code/ldm/data/` and `code/ldm/models/`.

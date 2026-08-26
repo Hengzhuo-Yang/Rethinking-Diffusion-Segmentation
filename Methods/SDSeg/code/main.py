@@ -1,3 +1,8 @@
+# MODIFICATION NOTICE (release prepared 2026-07-19): this file differs from
+# upstream SDSeg commit 0b0aa388a5e2def75abfbef90d7bcfc5c16f2704.
+# Changes cover audit metadata, portable data/config handling, validation-only
+# checkpoint selection, and release runtime checks. See MODIFICATIONS.md.
+
 import time
 t0 = time.time()
 import argparse, os, sys, datetime, glob, importlib, csv, json

@@ -1,12 +1,18 @@
+# MODIFICATION NOTICE (release prepared 2026-07-19): this file was changed from
+# the upstream SDSeg baseline to exclude release artifacts while retaining all
+# required source packages. See the method-root MODIFICATIONS.md.
 # Protected or generated assets are intentionally excluded from this release.
-code/data/
-code/models/
-data/
-models/
-logs/
-runs/
-outputs/
-checkpoints/
+# Keep these rules anchored to the SDSeg release root. Unanchored `data/` and
+# `models/` patterns would also hide required Python packages at
+# `code/ldm/data/` and `code/ldm/models/`.
+/code/data/
+/code/models/
+/data/
+/models/
+/logs/
+/runs/
+/outputs/
+/checkpoints/
 
 *.ckpt
 *.pth

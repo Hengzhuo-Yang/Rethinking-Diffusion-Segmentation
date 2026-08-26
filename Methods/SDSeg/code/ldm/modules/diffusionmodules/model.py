@@ -1,3 +1,8 @@
+# MODIFICATION NOTICE (release prepared 2026-07-19): this file differs from
+# upstream SDSeg commit 0b0aa388a5e2def75abfbef90d7bcfc5c16f2704.
+# Checkpoint loading was routed through the release compatibility helper.
+# See the method-root MODIFICATIONS.md.
+
 # pytorch_diffusion + derived encoder decoder
 import math
 import torch

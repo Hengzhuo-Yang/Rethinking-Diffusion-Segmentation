@@ -54,3 +54,11 @@ input convolution are part of that already implemented structural audit.
 
 `docs/SOURCE_PROVENANCE.csv` gives a SHA-256 and provenance classification for
 every source, config, script, and manifest under `code/`.
+
+## Publication-readiness notices (2026-08-26)
+
+Prominent modification headers were added to the two release-modified upstream
+files that previously lacked them: `code/ldm/modules/encoders/modules.py` and
+`code/ldm/models/autoencoder.py`. The method README was also updated to state
+the layered MIT and SDSeg/CreativeML Open RAIL-M licensing scope explicitly.
+These documentation-only changes do not alter model behavior.

@@ -1,3 +1,8 @@
+# MODIFICATION NOTICE (release prepared 2026-07-19): this config differs from
+# upstream SDSeg commit 0b0aa388a5e2def75abfbef90d7bcfc5c16f2704.
+# Changes cover portable asset/data roots, fixed splits, audit selection, and
+# validation-only checkpoint monitoring. See the method-root MODIFICATIONS.md.
+
 model:
   base_learning_rate: 1e-5   
   target: ldm.models.diffusion.SDSeg.SDSeg  # The rewritten version SDSeg!

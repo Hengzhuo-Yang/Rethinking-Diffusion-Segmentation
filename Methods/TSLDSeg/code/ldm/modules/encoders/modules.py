@@ -1,3 +1,8 @@
+# MODIFICATION NOTICE (release prepared 2026-07-19): this file differs from
+# upstream TSLDSeg commit 381827e1dc64a99132bbc4adf68e3c73d295c15a.
+# The unused CLIP image embedder default was aligned with the CUDA-only release
+# contract. See the method-root MODIFICATIONS.md.
+
 import torch
 import torch.nn as nn
 from functools import partial
