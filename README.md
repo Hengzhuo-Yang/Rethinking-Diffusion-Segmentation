@@ -1,5 +1,7 @@
 # Rethinking Diffusion Segmentation
 
+**Paper:** [Rethinking Diffusion Segmentation: When Does It Rely on Its Noisy State, and Does Diffusion Matter?](https://arxiv.org/abs/2609.23967)
+
 This repository is a code-only collection of six independently organized
 diffusion-based medical image segmentation method releases. Each method keeps
 its own environment, reproduction guide, upstream record, modification log,
